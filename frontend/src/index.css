@@ -1,0 +1,92 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  background: #f7f7f5;
+  color: #222;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-bottom: 1px solid #ddd;
+}
+
+nav a {
+  text-decoration: none;
+  color: #222;
+  font-weight: 500;
+}
+
+.spacer {
+  flex: 1;
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+label {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: #1d9e75;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.muted {
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.error {
+  color: #b91c1c;
+}
