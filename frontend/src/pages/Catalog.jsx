@@ -6,6 +6,7 @@ import { useCart } from "../context/CartContext.jsx";
 export default function Catalog() {
   const [excipients, setExcipients] = useState([]);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
   const [newListing, setNewListing] = useState({
     name: "",
     category: "",
@@ -17,12 +18,16 @@ export default function Catalog() {
   const { addItem } = useCart();
 
   const isSeller = user?.role === "manufacturer" || user?.role === "distributor";
+  const isVerifiedSeller = isSeller && user?.verification_status === "verified";
 
   function loadCatalog() {
-    api.listExcipients().then(setExcipients).catch((err) => setError(err.message));
+    api
+      .listExcipients({ search })
+      .then(setExcipients)
+      .catch((err) => setError(err.message));
   }
 
-  useEffect(loadCatalog, []);
+  useEffect(loadCatalog, [search]);
 
   async function handleCreateListing(e) {
     e.preventDefault();
@@ -40,11 +45,20 @@ export default function Catalog() {
     <div>
       <h2>Excipient catalog</h2>
       {error && <p className="error">{error}</p>}
+      <div className="card">
+        <h3>Search ingredients</h3>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name, category, or description"
+        />
+      </div>
 
       {isSeller && (
         <div className="card">
-          <h3>List a new excipient</h3>
-          <form onSubmit={handleCreateListing}>
+          <h3>Seller tools</h3>
+          {isVerifiedSeller ? (
+            <form onSubmit={handleCreateListing}>
             <label>Name</label>
             <input
               value={newListing.name}
@@ -80,6 +94,16 @@ export default function Catalog() {
             />
             <button type="submit">Add listing</button>
           </form>
+          ) : (
+            <div>
+              <p className="muted">
+                Your seller account is {user?.verification_status}. You must be verified before listing new excipients.
+              </p>
+              <p>
+                Update your documentation on the <a href="/seller">seller dashboard</a> and wait for admin approval.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -93,7 +117,9 @@ export default function Catalog() {
             </p>
             <p className="muted">{x.stock_quantity} in stock — sold by {x.seller_name || "seller"}</p>
             {user?.role === "scientist" && (
-              <button onClick={() => addItem(x)}>Add to cart</button>
+              <button onClick={() => addItem(x)} disabled={x.stock_quantity === 0}>
+                {x.stock_quantity === 0 ? "Out of stock" : "Add to cart"}
+              </button>
             )}
           </div>
         ))}

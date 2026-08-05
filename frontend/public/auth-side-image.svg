@@ -1,0 +1,19 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" rx="40" fill="#F3F7F2"/>
+  <path d="M180 420C180 346.192 243.192 283 317 283H483C556.808 283 620 346.192 620 420V470H180V420Z" fill="#E7F1EA"/>
+  <path d="M220 470H580" stroke="#BCCDC0" stroke-width="12" stroke-linecap="round"/>
+  <rect x="240" y="248" width="320" height="124" rx="20" fill="#FFF" stroke="#B0C6B7" stroke-width="2"/>
+  <circle cx="320" cy="310" r="18" fill="#1D9E75"/>
+  <circle cx="380" cy="310" r="18" fill="#1D9E75"/>
+  <rect x="440" y="290" width="60" height="40" rx="12" fill="#DEF0E4"/>
+  <path d="M240 300H560" stroke="#B0C6B7" stroke-width="10" stroke-linecap="round"/>
+  <path d="M400 190C493.137 190 568 264.863 568 358C568 393.203 553.239 425.694 527.61 450.536" stroke="#B0C6B7" stroke-width="18" stroke-linecap="round"/>
+  <path d="M260 180C166.863 180 92 254.863 92 348C92 383.434 106.976 415.393 133.875 439.739" stroke="#B0C6B7" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="400" cy="140" r="58" fill="#1D9E75" opacity="0.16"/>
+  <circle cx="420" cy="160" r="36" fill="#1D9E75"/>
+  <path d="M200 120H500" stroke="#2A4A39" stroke-width="12" stroke-linecap="round"/>
+  <path d="M210 160H430" stroke="#2A4A39" stroke-width="12" stroke-linecap="round"/>
+  <path d="M240 220H520" stroke="#2A4A39" stroke-width="12" stroke-linecap="round"/>
+  <text x="280" y="500" fill="#5E7B66" font-family="Arial, sans-serif" font-size="32">ExcipiHub</text>
+  <text x="280" y="540" fill="#8EA698" font-family="Arial, sans-serif" font-size="18">Verified supplier onboarding</text>
+</svg>

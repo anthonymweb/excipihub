@@ -45,10 +45,17 @@ class LoginView(APIView):
 
 
 class MeView(APIView):
-    """GET the logged-in user's own profile — used by the frontend to
-    know who's signed in and what role-based UI to show."""
+    """GET/PATCH the logged-in user's own profile — used by the frontend
+    to know who's signed in and what role-based UI to show, and to let
+    sellers submit or update verification documents."""
 
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         return Response(UserSerializer(request.user).data)
+
+    def patch(self, request):
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)

@@ -6,6 +6,8 @@ import Register from "./pages/Register.jsx";
 import Catalog from "./pages/Catalog.jsx";
 import Cart from "./pages/Cart.jsx";
 import Orders from "./pages/Orders.jsx";
+import SellerDashboard from "./pages/SellerDashboard.jsx";
+import SellerOrders from "./pages/SellerOrders.jsx";
 
 function RequireAuth({ children }) {
   const { token, loading } = useAuth();
@@ -24,6 +26,9 @@ function Nav() {
       {user?.role === "scientist" && (
         <Link to="/cart">Cart ({items.reduce((n, i) => n + i.quantity, 0)})</Link>
       )}
+      {user?.role === "manufacturer" || user?.role === "distributor" ? (
+        <Link to="/seller">Seller dashboard</Link>
+      ) : null}
       {user && <Link to="/orders">Orders</Link>}
       <span className="spacer" />
       {user ? (
@@ -55,6 +60,22 @@ export default function App() {
             element={
               <RequireAuth>
                 <Cart />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/seller"
+            element={
+              <RequireAuth>
+                <SellerDashboard />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/seller/orders"
+            element={
+              <RequireAuth>
+                <SellerOrders />
               </RequireAuth>
             }
           />

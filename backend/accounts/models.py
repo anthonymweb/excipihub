@@ -35,6 +35,9 @@ class User(AbstractUser):
     # Manufacturer / distributor-specific (blank for other roles)
     company_name = models.CharField(max_length=255, blank=True)
     business_license_no = models.CharField(max_length=100, blank=True)
+    license_url = models.URLField(blank=True)
+    gmp_cert_url = models.URLField(blank=True)
+    iso_cert_url = models.URLField(blank=True)
     verification_status = models.CharField(
         max_length=20,
         choices=VerificationStatus.choices,

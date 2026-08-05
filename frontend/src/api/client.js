@@ -26,10 +26,17 @@ export const api = {
   login: (payload) => request("/auth/login/", { method: "POST", body: payload }),
   me: (token) => request("/auth/me/", { token }),
 
-  listExcipients: (category) =>
-    request(`/excipients/${category ? `?category=${encodeURIComponent(category)}` : ""}`),
+  listExcipients: ({ category, search } = {}) => {
+    const params = [];
+    if (category) params.push(`category=${encodeURIComponent(category)}`);
+    if (search) params.push(`search=${encodeURIComponent(search)}`);
+    return request(`/excipients/${params.length ? `?${params.join("&")}` : ""}`);
+  },
   createExcipient: (payload, token) =>
     request("/excipients/", { method: "POST", body: payload, token }),
+
+  updateProfile: (payload, token) =>
+    request("/auth/me/", { method: "PATCH", body: payload, token }),
 
   listAddresses: (token) => request("/addresses/", { token }),
   createAddress: (payload, token) =>
@@ -38,4 +45,11 @@ export const api = {
   listOrders: (token) => request("/orders/", { token }),
   createOrder: (payload, token) =>
     request("/orders/", { method: "POST", body: payload, token }),
+  raiseOrderDispute: (orderId, payload, token) =>
+    request(`/orders/${orderId}/raise-dispute/`, { method: "POST", body: payload, token }),
+
+  listMyExcipients: (token) => request("/excipients/?my=true", { token }),
+  listSellerOrderItems: (token) => request("/seller-order-items/", { token }),
+  updateSellerOrderItem: (id, payload, token) =>
+    request(`/seller-order-items/${id}/`, { method: "PATCH", body: payload, token }),
 };

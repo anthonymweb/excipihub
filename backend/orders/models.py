@@ -59,6 +59,11 @@ class OrderItem(models.Model):
     unit_price_at_purchase = models.DecimalField(
         max_digits=12, decimal_places=2, validators=[MinValueValidator(0)]
     )
+    batch_number = models.CharField(max_length=100, blank=True)
+    coa_url = models.URLField(blank=True)
+    sds_url = models.URLField(blank=True)
+    tracking_number = models.CharField(max_length=255, blank=True)
+    shipped_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         indexes = [
@@ -111,3 +116,33 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review for order {self.order_id}: {self.rating}/5"
+
+
+class Dispute(models.Model):
+    class Status(models.TextChoices):
+        OPEN = "open", "Open"
+        INVESTIGATING = "investigating", "Investigating"
+        RESOLVED = "resolved", "Resolved"
+
+    class Outcome(models.TextChoices):
+        NONE = "none", "None"
+        BUYER = "buyer", "Buyer"
+        SELLER = "seller", "Seller"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="disputes")
+    raised_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="disputes"
+    )
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.OPEN)
+    outcome = models.CharField(max_length=20, choices=Outcome.choices, default=Outcome.NONE)
+    resolution = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["status"])]
+
+    def __str__(self):
+        return f"Dispute {self.id} for order {self.order_id} ({self.status})"

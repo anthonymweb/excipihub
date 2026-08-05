@@ -7,6 +7,7 @@ from .models import User
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     list_display = ("username", "email", "role", "verification_status", "is_active_seller")
+    list_editable = ("verification_status",)
     list_filter = ("role", "verification_status")
     fieldsets = BaseUserAdmin.fieldsets + (
         (

@@ -15,9 +15,13 @@ class UserSerializer(serializers.ModelSerializer):
             "institution_name",
             "company_name",
             "business_license_no",
+            "license_url",
+            "gmp_cert_url",
+            "iso_cert_url",
             "verification_status",
+            "is_staff",
         ]
-        read_only_fields = ["id", "verification_status"]
+        read_only_fields = ["id", "verification_status", "is_staff"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -34,7 +38,25 @@ class RegisterSerializer(serializers.ModelSerializer):
             "institution_name",
             "company_name",
             "business_license_no",
+            "license_url",
+            "gmp_cert_url",
+            "iso_cert_url",
         ]
+
+    def validate(self, attrs):
+        role = attrs.get("role")
+        is_seller = role in {"manufacturer", "distributor"}
+        if is_seller:
+            missing = [
+                name
+                for name in ["company_name", "business_license_no", "license_url", "gmp_cert_url", "iso_cert_url"]
+                if not attrs.get(name)
+            ]
+            if missing:
+                raise serializers.ValidationError(
+                    {"detail": "Seller accounts must include company and compliance documents.", "missing": missing}
+                )
+        return attrs
 
     def create(self, validated_data):
         password = validated_data.pop("password")
