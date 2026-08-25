@@ -52,4 +52,24 @@ export const api = {
   listSellerOrderItems: (token) => request("/seller-order-items/", { token }),
   updateSellerOrderItem: (id, payload, token) =>
     request(`/seller-order-items/${id}/`, { method: "PATCH", body: payload, token }),
+
+  getExcipient: (id) => request(`/excipients/${id}/`),
+  updateExcipient: (id, payload, token) =>
+    request(`/excipients/${id}/`, { method: "PATCH", body: payload, token }),
+
+  confirmDelivery: (orderId, token) =>
+    request(`/orders/${orderId}/confirm-delivery/`, { method: "POST", token }),
+
+  updateAddress: (id, payload, token) =>
+    request(`/addresses/${id}/`, { method: "PATCH", body: payload, token }),
+  deleteAddress: (id, token) =>
+    request(`/addresses/${id}/`, { method: "DELETE", token }),
+
+  adminPendingSellers: () => request("/admin/sellers/"),
+  adminVerifySeller: (id, action) =>
+    request(`/admin/sellers/${id}/verify/`, { method: "POST", body: { action } }),
+  adminDisputes: () => request("/admin/disputes/"),
+  adminResolveDispute: (id, outcome, resolution) =>
+    request(`/admin/disputes/${id}/resolve/`, { method: "POST", body: { outcome, resolution } }),
+  adminUsers: (role) => request(`/admin/users/${role ? `?role=${role}` : ""}`),
 };
