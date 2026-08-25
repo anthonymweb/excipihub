@@ -11,6 +11,7 @@ import Orders from "./pages/Orders.jsx";
 import SellerDashboard from "./pages/SellerDashboard.jsx";
 import SellerOrders from "./pages/SellerOrders.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
+import AdminPanel from "./pages/AdminPanel.jsx";
 
 function RequireAuth({ children }) {
   const { token, loading } = useAuth();
@@ -59,6 +60,14 @@ export default function App() {
               element={
                 <RequireAuth>
                   <Orders />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <RequireAuth>
+                  <AdminPanel />
                 </RequireAuth>
               }
             />

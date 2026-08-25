@@ -68,11 +68,11 @@ export const api = {
   deleteAddress: (id, token) =>
     request(`/addresses/${id}/`, { method: "DELETE", token }),
 
-  adminPendingSellers: () => request("/admin/sellers/"),
-  adminVerifySeller: (id, action) =>
-    request(`/admin/sellers/${id}/verify/`, { method: "POST", body: { action } }),
-  adminDisputes: () => request("/admin/disputes/"),
-  adminResolveDispute: (id, outcome, resolution) =>
-    request(`/admin/disputes/${id}/resolve/`, { method: "POST", body: { outcome, resolution } }),
-  adminUsers: (role) => request(`/admin/users/${role ? `?role=${role}` : ""}`),
+  adminPendingSellers: (token) => request("/admin/sellers/", { token }),
+  adminVerifySeller: (id, action, token) =>
+    request(`/admin/sellers/${id}/verify/`, { method: "POST", body: { action }, token }),
+  adminDisputes: (token) => request("/admin/disputes/", { token }),
+  adminResolveDispute: (id, outcome, resolution, token) =>
+    request(`/admin/disputes/${id}/resolve/`, { method: "POST", body: { outcome, resolution }, token }),
+  adminUsers: (role, token) => request(`/admin/users/${role ? `?role=${role}` : ""}`, { token }),
 };
