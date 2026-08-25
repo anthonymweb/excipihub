@@ -64,6 +64,42 @@ export default function Orders() {
             <span>Total</span>
             <span className="text-accent-700">{o.total_amount}</span>
           </div>
+          {o.status !== "delivered" && o.status !== "cancelled" && (
+            <div className="mt-3 pt-3 border-t">
+              {activeOrderId === o.id ? (
+                <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                  <textarea
+                    className="w-full border rounded p-2 text-sm"
+                    rows={2}
+                    placeholder="Reason for dispute..."
+                    value={disputeReason}
+                    onChange={(e) => setDisputeReason(e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                      onClick={() => handleRaiseDispute(o.id)}
+                    >
+                      Submit
+                    </button>
+                    <button
+                      className="px-3 py-1 bg-slate-200 rounded text-sm hover:bg-slate-300"
+                      onClick={() => { setActiveOrderId(null); setDisputeReason(""); }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="text-sm text-red-600 hover:underline"
+                  onClick={(e) => { e.preventDefault(); setActiveOrderId(o.id); }}
+                >
+                  Raise dispute
+                </button>
+              )}
+            </div>
+          )}
         </Link>
       ))}
     </div>

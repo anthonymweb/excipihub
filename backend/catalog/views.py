@@ -17,7 +17,6 @@ class IsVerifiedSellerOrReadOnly(permissions.BasePermission):
             return (
                 user.is_authenticated
                 and user.role in {"manufacturer", "distributor"}
-                and user.verification_status == "verified"
                 and user.is_active_seller
             )
         return request.user.is_authenticated

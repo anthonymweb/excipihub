@@ -89,6 +89,15 @@ export default function App() {
                 </RequireAuth>
               }
             />
+            <Route
+              path="*"
+              element={
+                <div className="text-center py-20">
+                  <h1 className="text-2xl font-bold mb-2">Page not found</h1>
+                  <a href="/" className="text-accent-600 hover:underline">Go home</a>
+                </div>
+              }
+            />
           </Routes>
         </main>
         <Footer />
