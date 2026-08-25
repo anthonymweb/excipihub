@@ -1,6 +1,8 @@
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext.jsx";
-import { CartProvider, useCart } from "./context/CartContext.jsx";
+import { CartProvider } from "./context/CartContext.jsx";
+import Navbar from "./components/Navbar.jsx";
+import Footer from "./components/Footer.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Catalog from "./pages/Catalog.jsx";
@@ -16,79 +18,52 @@ function RequireAuth({ children }) {
   return children;
 }
 
-function Nav() {
-  const { user, logout } = useAuth();
-  const { items } = useCart();
-
-  return (
-    <nav>
-      <Link to="/">ExcipiHub</Link>
-      {user?.role === "scientist" && (
-        <Link to="/cart">Cart ({items.reduce((n, i) => n + i.quantity, 0)})</Link>
-      )}
-      {user?.role === "manufacturer" || user?.role === "distributor" ? (
-        <Link to="/seller">Seller dashboard</Link>
-      ) : null}
-      {user && <Link to="/orders">Orders</Link>}
-      <span className="spacer" />
-      {user ? (
-        <>
-          <span className="muted">{user.username} ({user.role})</span>
-          <button onClick={logout}>Log out</button>
-        </>
-      ) : (
-        <>
-          <Link to="/login">Log in</Link>
-          <Link to="/register">Register</Link>
-        </>
-      )}
-    </nav>
-  );
-}
-
 export default function App() {
   return (
     <CartProvider>
-      <Nav />
-      <main>
-        <Routes>
-          <Route path="/" element={<Catalog />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/cart"
-            element={
-              <RequireAuth>
-                <Cart />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/seller"
-            element={
-              <RequireAuth>
-                <SellerDashboard />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/seller/orders"
-            element={
-              <RequireAuth>
-                <SellerOrders />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/orders"
-            element={
-              <RequireAuth>
-                <Orders />
-              </RequireAuth>
-            }
-          />
-        </Routes>
-      </main>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Catalog />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/cart"
+              element={
+                <RequireAuth>
+                  <Cart />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/seller"
+              element={
+                <RequireAuth>
+                  <SellerDashboard />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/seller/orders"
+              element={
+                <RequireAuth>
+                  <SellerOrders />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <RequireAuth>
+                  <Orders />
+                </RequireAuth>
+              }
+            />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
     </CartProvider>
   );
 }
