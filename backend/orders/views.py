@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -51,6 +52,16 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(raised_by=request.user)
         return Response(serializer.data, status=201)
+
+    @action(detail=True, methods=["post"], url_path="confirm-delivery")
+    def confirm_delivery(self, request, pk=None):
+        order = self.get_object()
+        if order.buyer != request.user:
+            return Response({"detail": "Not authorized."}, status=403)
+        if order.status != Order.Status.DELIVERED:
+            order.status = Order.Status.DELIVERED
+            order.save(update_fields=["status"])
+        return Response(OrderSerializer(order).data)
 
 
 class DisputePermission(permissions.BasePermission):
