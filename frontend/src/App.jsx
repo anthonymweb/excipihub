@@ -10,6 +10,7 @@ import Cart from "./pages/Cart.jsx";
 import Orders from "./pages/Orders.jsx";
 import SellerDashboard from "./pages/SellerDashboard.jsx";
 import SellerOrders from "./pages/SellerOrders.jsx";
+import ProductDetail from "./pages/ProductDetail.jsx";
 
 function RequireAuth({ children }) {
   const { token, loading } = useAuth();
@@ -26,6 +27,7 @@ export default function App() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Catalog />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route
