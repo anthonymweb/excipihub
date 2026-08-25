@@ -14,6 +14,7 @@ class ExcipientSerializer(serializers.ModelSerializer):
             "seller_name",
             "name",
             "category",
+            "grade",
             "description",
             "unit",
             "unit_price",

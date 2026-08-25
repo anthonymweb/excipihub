@@ -18,6 +18,7 @@ class Excipient(models.Model):
     )
     name = models.CharField(max_length=255)
     category = models.CharField(max_length=100)  # e.g. "Binder", "Preservative"
+    grade = models.CharField(max_length=50, blank=True, help_text="e.g. USP, EP, BP, JP")
     description = models.TextField(blank=True)
     unit = models.CharField(max_length=20)  # e.g. "kg", "g", "L"
     unit_price = models.DecimalField(
