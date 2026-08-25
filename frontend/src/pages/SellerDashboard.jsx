@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -110,9 +111,14 @@ export default function SellerDashboard() {
         <p>
           Once verified, you can list excipients from the catalog page and manage orders from the seller orders page.
         </p>
-        <p>
-          <a href="/seller/orders">Go to seller orders</a>
-        </p>
+        <div className="flex gap-4 mt-4">
+          <a href="/seller/orders" className="btn-secondary inline-block">
+            View seller orders
+          </a>
+          <Link to="/seller/listings" className="btn-primary inline-block">
+            Manage listings
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api } from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
+import StatusBadge from "../components/StatusBadge.jsx";
+import OrderTimeline from "../components/OrderTimeline.jsx";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -20,7 +23,7 @@ export default function Orders() {
     }
     setMessage("");
     try {
-      await api.raiseOrderDispute(orderId, { reason: disputeReason });
+      await api.raiseOrderDispute(orderId, { reason: disputeReason }, token);
       setMessage("Dispute raised successfully. Admin will review it.");
       setDisputeReason("");
       setActiveOrderId(null);
@@ -35,48 +38,33 @@ export default function Orders() {
       {message && <p className="muted">{message}</p>}
       {orders.length === 0 && <p className="muted">No orders yet.</p>}
       {orders.map((o) => (
-        <div className="card" key={o.id}>
-          <p>
-            <strong>Order {o.id.slice(0, 8)}</strong> — {o.status}
-          </p>
-          <ul>
+        <Link
+          to={`/orders/${o.id}`}
+          key={o.id}
+          className="card block hover:shadow-md transition-shadow mb-4"
+        >
+          <div className="flex justify-between items-start mb-2">
+            <p className="font-semibold text-lg">Order {o.id.slice(0, 8)}</p>
+            <StatusBadge status={o.status}>
+              {o.status?.replace(/_/g, " ")}
+            </StatusBadge>
+          </div>
+          <OrderTimeline status={o.status} />
+          <div className="mt-3 space-y-1">
             {o.items.map((item) => (
-              <li key={item.id}>
-                {item.quantity} x {item.excipient_name} @ {item.unit_price_at_purchase}
-                {item.batch_number && <div>Batch: {item.batch_number}</div>}
-                {item.coa_url && (
-                  <div>
-                    COA: <a href={item.coa_url} target="_blank" rel="noreferrer">Download</a>
-                  </div>
-                )}
-                {item.sds_url && (
-                  <div>
-                    SDS: <a href={item.sds_url} target="_blank" rel="noreferrer">Download</a>
-                  </div>
-                )}
-                {item.tracking_number && <div>Tracking: {item.tracking_number}</div>}
-                {item.shipped_at && <div>Shipped at: {new Date(item.shipped_at).toLocaleString()}</div>}
-              </li>
+              <div key={item.id} className="flex justify-between text-sm">
+                <span className="text-slate-600">
+                  {item.quantity} x {item.excipient_name}
+                </span>
+                <span className="text-slate-500">{item.unit_price_at_purchase}</span>
+              </div>
             ))}
-          </ul>
-          <p>Total: {o.total_amount}</p>
-          <p className="muted">Delivery address ID: {o.delivery_address}</p>
-          {o.has_active_dispute ? (
-            <p className="muted">A dispute is already open for this order.</p>
-          ) : o.status !== "delivered" ? (
-            <div>
-              <label>Dispute reason</label>
-              <textarea
-                value={activeOrderId === o.id ? disputeReason : ""}
-                onChange={(e) => {
-                  setActiveOrderId(o.id);
-                  setDisputeReason(e.target.value);
-                }}
-              />
-              <button onClick={() => handleRaiseDispute(o.id)}>Raise dispute</button>
-            </div>
-          ) : null}
-        </div>
+          </div>
+          <div className="flex justify-between mt-3 pt-3 border-t font-bold text-sm">
+            <span>Total</span>
+            <span className="text-accent-700">{o.total_amount}</span>
+          </div>
+        </Link>
       ))}
     </div>
   );

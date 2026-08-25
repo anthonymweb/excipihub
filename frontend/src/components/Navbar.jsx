@@ -37,6 +37,9 @@ export default function Navbar() {
               {isSeller && (
                 <Link to="/seller/orders" className="text-slate-600 hover:text-slate-900">Orders</Link>
               )}
+              {isSeller && (
+                <Link to="/seller/listings" className="text-slate-600 hover:text-slate-900">Listings</Link>
+              )}
               {isAdmin && (
                 <Link to="/admin/dashboard" className="text-slate-600 hover:text-slate-900">Admin</Link>
               )}
@@ -82,6 +85,9 @@ export default function Navbar() {
             )}
             {isSeller && (
               <Link to="/seller/orders" className="block py-2 text-slate-600" onClick={() => setMobileOpen(false)}>Orders</Link>
+            )}
+            {isSeller && (
+              <Link to="/seller/listings" className="block py-2 text-slate-600" onClick={() => setMobileOpen(false)}>Listings</Link>
             )}
             {isAdmin && (
               <Link to="/admin/dashboard" className="block py-2 text-slate-600" onClick={() => setMobileOpen(false)}>Admin</Link>
