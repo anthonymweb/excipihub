@@ -26,10 +26,13 @@ export const api = {
   login: (payload) => request("/auth/login/", { method: "POST", body: payload }),
   me: (token) => request("/auth/me/", { token }),
 
-  listExcipients: ({ category, search } = {}) => {
+  listExcipients: ({ category, search, grade, page, ordering } = {}) => {
     const params = [];
     if (category) params.push(`category=${encodeURIComponent(category)}`);
     if (search) params.push(`search=${encodeURIComponent(search)}`);
+    if (grade) params.push(`grade=${encodeURIComponent(grade)}`);
+    if (page) params.push(`page=${page}`);
+    if (ordering) params.push(`ordering=${encodeURIComponent(ordering)}`);
     return request(`/excipients/${params.length ? `?${params.join("&")}` : ""}`);
   },
   createExcipient: (payload, token) =>
