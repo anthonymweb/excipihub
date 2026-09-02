@@ -5,19 +5,32 @@ import { useAuth } from "../context/AuthContext.jsx";
 import OrderTimeline from "../components/OrderTimeline.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
 import LoadingSpinner from "../components/LoadingSpinner.jsx";
+import { Drawer } from "../components/UI.jsx";
 
 export default function OrderDetail() {
   const { id } = useParams();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [disputeOpen, setDisputeOpen] = useState(false);
+  const [disputeReason, setDisputeReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
+  const isBuyer = user?.role === "scientist";
+  const canReview = ["delivered", "buyer_confirmed", "completed"].includes(order?.status);
 
   useEffect(() => {
     if (!token) return;
     api
       .listOrders(token)
-      .then((orders) => {
+      .then((data) => {
+        const orders = data.results || data;
         const found = orders.find((o) => o.id === id);
         setOrder(found || null);
       })
@@ -40,6 +53,54 @@ export default function OrderDetail() {
       setOrder((prev) => ({ ...prev, status: "delivered" }));
     } catch (err) {
       setError(err.message);
+    }
+  }
+
+  async function handleRaiseDispute() {
+    if (!disputeReason.trim()) {
+      setError("Please provide a reason for the dispute.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await api.raiseOrderDispute(order.id, { reason: disputeReason.trim() }, token);
+      setOrder((prev) => ({ ...prev, has_active_dispute: true }));
+      setDisputeOpen(false);
+      setDisputeReason("");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handlePay() {
+    setPaying(true);
+    try {
+      const updated = await api.payOrder(id, token);
+      setOrder(updated);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setPaying(false);
+    }
+  }
+
+  async function handleSubmitReview() {
+    setReviewSubmitting(true);
+    try {
+      const review = await api.createReview(
+        { order: order.id, rating: reviewRating, comment: reviewComment },
+        token
+      );
+      setOrder((prev) => ({ ...prev, review }));
+      setReviewOpen(false);
+      setReviewComment("");
+      setReviewRating(5);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setReviewSubmitting(false);
     }
   }
 
@@ -142,7 +203,12 @@ export default function OrderDetail() {
         </div>
       )}
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 flex-wrap">
+        {order.status === "pending_payment" && (
+          <button onClick={handlePay} disabled={paying} className="btn-primary px-6 py-3 disabled:opacity-50">
+            {paying ? "Processing..." : `Pay ${order.total_amount}`}
+          </button>
+        )}
         {canCancel && (
           <button
             onClick={handleCancelOrder}
@@ -156,7 +222,103 @@ export default function OrderDetail() {
             Mark as Received
           </button>
         )}
+        {isBuyer && !order.has_active_dispute && (
+          <button
+            onClick={() => setDisputeOpen(true)}
+            className="btn-danger px-6 py-3"
+          >
+            Raise Dispute
+          </button>
+        )}
+        {order.has_active_dispute && (
+          <span className="badge badge-pending self-center">Dispute in progress</span>
+        )}
       </div>
+
+      {canReview && (
+        <div className="card mb-6">
+          <h2 className="font-semibold mb-3">Your Review</h2>
+          {order.review ? (
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-accent-600 font-bold">{order.review.rating}/5</span>
+                <span className="text-sm text-slate-400">
+                  by {order.review.reviewer_name} ·{" "}
+                  {new Date(order.review.created_at).toLocaleDateString()}
+                </span>
+              </div>
+              <p className="text-slate-600">{order.review.comment || "No comment provided."}</p>
+            </div>
+          ) : reviewOpen ? (
+            <div className="space-y-3">
+              <div>
+                <label className="label">Rating</label>
+                <select
+                  className="input"
+                  value={reviewRating}
+                  onChange={(e) => setReviewRating(Number(e.target.value))}
+                >
+                  {[5, 4, 3, 2, 1].map((n) => (
+                    <option key={n} value={n}>
+                      {n} / 5
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="label">Comment</label>
+                <textarea
+                  rows="3"
+                  className="input"
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Share your experience with this supplier..."
+                />
+              </div>
+              {error && <p className="text-red-600 text-sm">{error}</p>}
+              <div className="flex gap-3 justify-end">
+                <button onClick={() => setReviewOpen(false)} className="btn-secondary">
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitReview}
+                  disabled={reviewSubmitting}
+                  className="btn-primary disabled:opacity-50"
+                >
+                  {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button onClick={() => setReviewOpen(true)} className="btn-secondary">
+              Leave a review
+            </button>
+          )}
+        </div>
+      )}
+
+      <Drawer open={disputeOpen} onClose={() => setDisputeOpen(false)} title="Raise a Dispute">
+        <p className="text-sm text-slate-600 mb-4">
+          Describe the issue with order {order.id?.slice(0, 8)}. Our team will review it.
+        </p>
+        <label className="label">Reason</label>
+        <textarea
+          rows="5"
+          value={disputeReason}
+          onChange={(e) => setDisputeReason(e.target.value)}
+          className="input mb-4"
+          placeholder="Explain the problem (e.g. wrong item, damaged shipment)..."
+        />
+        {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
+        <div className="flex gap-3 justify-end">
+          <button onClick={() => setDisputeOpen(false)} className="btn-secondary">
+            Cancel
+          </button>
+          <button onClick={handleRaiseDispute} disabled={submitting} className="btn-danger disabled:opacity-50">
+            {submitting ? "Submitting..." : "Submit Dispute"}
+          </button>
+        </div>
+      </Drawer>
     </div>
   );
 }

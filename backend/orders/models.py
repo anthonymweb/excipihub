@@ -12,12 +12,24 @@ class Order(models.Model):
     """
 
     class Status(models.TextChoices):
-        PENDING = "pending", "Pending"
+        PENDING_PAYMENT = "pending_payment", "Pending Payment"
+        PAYMENT_CONFIRMED = "payment_confirmed", "Payment Confirmed"
+        SUPPLIER_REVIEW = "supplier_review", "Supplier Review"
         CONFIRMED = "confirmed", "Confirmed"
+        BATCH_ALLOCATED = "batch_allocated", "Batch Allocated"
+        QC_RELEASE = "qc_release", "QC Release"
         PREPARING = "preparing", "Preparing"
-        OUT_FOR_DELIVERY = "out_for_delivery", "Out for delivery"
+        PACKED = "packed", "Packed"
+        SHIPPED = "shipped", "Shipped"
+        IN_TRANSIT = "in_transit", "In Transit"
         DELIVERED = "delivered", "Delivered"
+        BUYER_CONFIRMED = "buyer_confirmed", "Buyer Confirmed"
+        COMPLETED = "completed", "Completed"
         CANCELLED = "cancelled", "Cancelled"
+        REJECTED = "rejected", "Rejected"
+        DISPUTED = "disputed", "Disputed"
+        RETURN_REQUESTED = "return_requested", "Return Requested"
+        RECALLED = "recalled", "Recalled"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     buyer = models.ForeignKey(
@@ -26,7 +38,7 @@ class Order(models.Model):
     delivery_address = models.ForeignKey(
         "logistics.Address", on_delete=models.PROTECT, related_name="orders"
     )
-    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING_PAYMENT)
     total_amount = models.DecimalField(
         max_digits=12, decimal_places=2, validators=[MinValueValidator(0)]
     )
@@ -81,6 +93,7 @@ class Payment(models.Model):
 
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
         PAID = "paid", "Paid"
         FAILED = "failed", "Failed"
         REFUNDED = "refunded", "Refunded"

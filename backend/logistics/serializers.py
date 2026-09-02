@@ -8,3 +8,7 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = ["id", "label", "district", "street", "latitude", "longitude", "is_default"]
         read_only_fields = ["id"]
+        extra_kwargs = {
+            "latitude": {"required": False},
+            "longitude": {"required": False},
+        }

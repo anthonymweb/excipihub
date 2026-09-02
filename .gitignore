@@ -4,6 +4,8 @@ backend/*/__pycache__/
 backend/*/migrations/__pycache__/
 backend/db.sqlite3
 backend/*.pyc
+backend/staticfiles/
+backend/media/
 
 frontend/node_modules/
 frontend/dist/
@@ -11,3 +13,5 @@ frontend/dist/
 .env
 .vscode/
 .DS_Store
+.superpowers/
+docs/superpowers/

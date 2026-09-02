@@ -52,8 +52,8 @@ export default function Catalog() {
       .finally(() => setLoading(false));
   }, [search, category, grade, sortBy, page]);
 
-  function handleAddToCart(excipient) {
-    addItem(excipient);
+  function handleAddToCart(excipient, qty) {
+    for (let i = 0; i < qty; i++) addItem(excipient);
   }
 
   async function handleCreate(e) {

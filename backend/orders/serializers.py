@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from catalog.models import Excipient
 
-from .models import Dispute, Order, OrderItem, Payment
+from .models import Dispute, Order, OrderItem, Payment, Review
 
 
 class OrderItemWriteSerializer(serializers.Serializer):
@@ -21,6 +21,17 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = ["amount", "method", "status", "transaction_ref", "paid_at"]
         read_only_fields = fields
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    reviewer_name = serializers.CharField(source="reviewer.username", read_only=True)
+    order_id = serializers.UUIDField(source="order.id", read_only=True)
+
+    class Meta:
+        model = Review
+        fields = ["id", "order", "order_id", "reviewer", "reviewer_name", "rating", "comment", "created_at"]
+        read_only_fields = ["id", "reviewer", "reviewer_name", "order_id", "created_at"]
+        extra_kwargs = {"order": {"write_only": True, "required": True}}
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -84,6 +95,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     items = OrderItemSerializer(many=True, read_only=True)
     payment = PaymentSerializer(read_only=True)
+    review = ReviewSerializer(read_only=True)
     has_active_dispute = serializers.SerializerMethodField()
 
     class Meta:
@@ -95,6 +107,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "status",
             "total_amount",
             "payment",
+            "review",
             "notes",
             "items",
             "has_active_dispute",
@@ -176,7 +189,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         buyer = self.context["request"].user
 
         total = 0
-        order = Order.objects.create(buyer=buyer, total_amount=0, status=Order.Status.CONFIRMED, **validated_data)
+        order = Order.objects.create(buyer=buyer, total_amount=0, status=Order.Status.PENDING_PAYMENT, **validated_data)
 
         for item in items_data:
             excipient = item["excipient"]
@@ -199,9 +212,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             order=order,
             amount=total,
             method=payment_method,
-            status=Payment.Status.PAID,
-            transaction_ref=f"PAY-{order.id.hex[:12]}",
-            paid_at=timezone.now(),
+            status=Payment.Status.PENDING,
         )
 
         return order

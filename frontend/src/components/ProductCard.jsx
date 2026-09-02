@@ -1,6 +1,19 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useToast } from "./Toast.jsx";
 
 export default function ProductCard({ excipient, onAddToCart, isSeller }) {
+  const [qty, setQty] = useState(1);
+  const toast = useToast();
+
+  function handleAdd() {
+    if (onAddToCart) {
+      onAddToCart(excipient, qty);
+      toast.success(`Added ${excipient.name} × ${qty} to cart`);
+      setQty(1);
+    }
+  }
+
   return (
     <div className="card hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-2">
@@ -28,13 +41,32 @@ export default function ProductCard({ excipient, onAddToCart, isSeller }) {
         </div>
       </div>
       {!isSeller && onAddToCart && (
-        <button
-          onClick={() => onAddToCart(excipient)}
-          disabled={excipient.stock_quantity === 0}
-          className="btn-primary w-full mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {excipient.stock_quantity === 0 ? "Out of stock" : "Add to cart"}
-        </button>
+        <div className="mt-4 space-y-2">
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={() => setQty((q) => Math.max(1, q - 1))}
+              className="w-8 h-8 rounded-lg border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+              disabled={qty <= 1}
+            >
+              −
+            </button>
+            <span className="w-8 text-center font-medium text-slate-900">{qty}</span>
+            <button
+              onClick={() => setQty((q) => Math.min(excipient.stock_quantity, q + 1))}
+              className="w-8 h-8 rounded-lg border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+              disabled={qty >= excipient.stock_quantity}
+            >
+              +
+            </button>
+          </div>
+          <button
+            onClick={handleAdd}
+            disabled={excipient.stock_quantity === 0}
+            className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {excipient.stock_quantity === 0 ? "Out of stock" : "Add to cart"}
+          </button>
+        </div>
       )}
     </div>
   );

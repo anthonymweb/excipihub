@@ -31,9 +31,9 @@ export default function AdminPanel() {
     setLoading(true);
     setError("");
     Promise.all([api.adminPendingSellers(token), api.adminDisputes(token)])
-      .then(([sellers, disputesData]) => {
-        setPendingSellers(sellers);
-        setDisputes(disputesData);
+      .then(([sellersData, disputesData]) => {
+        setPendingSellers(sellersData.results || sellersData);
+        setDisputes(disputesData.results || disputesData);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -78,7 +78,7 @@ export default function AdminPanel() {
   if (!user || user.role !== "admin") {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <p className="muted">Redirecting...</p>
+        <p className="text-slate-500">Redirecting...</p>
       </div>
     );
   }
@@ -114,11 +114,11 @@ export default function AdminPanel() {
       </div>
 
       {loading ? (
-        <p className="muted">Loading...</p>
+        <p className="text-slate-500">Loading...</p>
       ) : activeTab === "sellers" ? (
         <div>
           {pendingSellers.length === 0 ? (
-            <p className="muted">No pending sellers.</p>
+            <p className="text-center text-slate-500 py-8">No pending sellers.</p>
           ) : (
             pendingSellers.map((seller) => (
               <div key={seller.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-4">
@@ -179,7 +179,7 @@ export default function AdminPanel() {
       ) : (
         <div>
           {disputes.length === 0 ? (
-            <p className="muted">No disputes found.</p>
+            <p className="text-center text-slate-500 py-8">No disputes found.</p>
           ) : (
             disputes.map((d) => (
               <div key={d.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-4">

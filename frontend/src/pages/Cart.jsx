@@ -19,18 +19,18 @@ export default function Cart() {
     state: "",
     postal_code: "",
     country: "",
-    latitude: "",
-    longitude: "",
   });
   const [editingAddress, setEditingAddress] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [placed, setPlaced] = useState(null);
+  const [showReview, setShowReview] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (token) {
-      api.listAddresses(token).then((addrs) => {
+      api.listAddresses(token).then((data) => {
+        const addrs = data.results || data;
         setAddresses(addrs);
         if (addrs.length) setSelectedAddressId(addrs[0].id);
       }).catch(() => {});
@@ -44,7 +44,7 @@ export default function Cart() {
       const addr = await api.createAddress(newAddress, token);
       setAddresses((prev) => [...prev, addr]);
       setSelectedAddressId(addr.id);
-      setNewAddress({ label: "", district: "", street: "", city: "", state: "", postal_code: "", country: "", latitude: "", longitude: "" });
+      setNewAddress({ label: "", district: "", street: "", city: "", state: "", postal_code: "", country: "" });
       setShowNewAddressForm(false);
     } catch (err) {
       setError(err.message);
@@ -88,16 +88,7 @@ export default function Cart() {
     try {
       const order = await api.createOrder(
         {
-          delivery_address: {
-            street: addr.street || "",
-            city: addr.city || "",
-            state: addr.state || "",
-            postal_code: addr.postal_code || "",
-            country: addr.country || "",
-            district: addr.district || "",
-            latitude: addr.latitude || 0,
-            longitude: addr.longitude || 0,
-          },
+          delivery_address: selectedAddressId,
           items: items.map((i) => ({ excipient: i.excipient, quantity: i.quantity })),
         },
         token
@@ -128,9 +119,23 @@ export default function Cart() {
             Order <code className="bg-slate-100 px-2 py-1 rounded">{placed.id?.slice(0, 8)}</code>
           </p>
           <p className="text-xl font-bold text-accent-700 mb-6">Total: {placed.total_amount}</p>
-          <button onClick={() => navigate("/orders")} className="btn-primary">
-            View my orders
-          </button>
+          {placed.status === "pending_payment" ? (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-500">
+                Complete payment to confirm your order.
+              </p>
+              <button
+                onClick={() => navigate(`/orders/${placed.id}`)}
+                className="btn-primary"
+              >
+                Pay now
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => navigate("/orders")} className="btn-primary">
+              View my orders
+            </button>
+          )}
         </div>
       </div>
     );
@@ -144,7 +149,7 @@ export default function Cart() {
       {items.length === 0 ? (
         <div className="card text-center py-12">
           <p className="text-slate-500 mb-4">Your cart is empty</p>
-          <button onClick={() => navigate("/")} className="btn-primary">Browse catalog</button>
+          <button onClick={() => navigate("/catalog")} className="btn-primary">Browse catalog</button>
         </div>
       ) : (
         <>
@@ -279,10 +284,6 @@ export default function Cart() {
                   <input className="input" placeholder="Postal code" value={editingAddress.postal_code || ""} onChange={(e) => setEditingAddress({ ...editingAddress, postal_code: e.target.value })} />
                   <input className="input" placeholder="Country" value={editingAddress.country || ""} onChange={(e) => setEditingAddress({ ...editingAddress, country: e.target.value })} />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <input className="input" type="number" step="0.000001" placeholder="Latitude" value={editingAddress.latitude || ""} onChange={(e) => setEditingAddress({ ...editingAddress, latitude: e.target.value })} />
-                  <input className="input" type="number" step="0.000001" placeholder="Longitude" value={editingAddress.longitude || ""} onChange={(e) => setEditingAddress({ ...editingAddress, longitude: e.target.value })} />
-                </div>
                 <div className="flex gap-2">
                   <button type="submit" className="btn-primary">Save changes</button>
                   <button type="button" onClick={() => setEditingAddress(null)} className="btn-secondary">Cancel</button>
@@ -309,10 +310,6 @@ export default function Cart() {
                     <input className="input" placeholder="Postal code" value={newAddress.postal_code} onChange={(e) => setNewAddress({ ...newAddress, postal_code: e.target.value })} />
                     <input className="input" placeholder="Country" value={newAddress.country} onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <input className="input" type="number" step="0.000001" placeholder="Latitude" value={newAddress.latitude} onChange={(e) => setNewAddress({ ...newAddress, latitude: e.target.value })} />
-                    <input className="input" type="number" step="0.000001" placeholder="Longitude" value={newAddress.longitude} onChange={(e) => setNewAddress({ ...newAddress, longitude: e.target.value })} />
-                  </div>
                   <button type="submit" className="btn-primary">Save address</button>
                 </form>
               </details>
@@ -321,12 +318,68 @@ export default function Cart() {
 
           <button
             disabled={!selectedAddressId || loading}
-            onClick={handlePlaceOrder}
+            onClick={() => setShowReview(true)}
             className="btn-primary w-full py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Placing order..." : "Place order"}
+            Review order
           </button>
         </>
+      )}
+
+      {showReview && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-xl font-bold mb-4">Review your order</h2>
+              {error && <p className="text-red-600 text-sm mb-4 bg-red-50 px-4 py-2 rounded-lg">{error}</p>}
+
+              <div className="space-y-3 mb-4">
+                {Object.entries(grouped).map(([seller, sellerItems]) => (
+                  <div key={seller}>
+                    <p className="text-sm font-semibold text-slate-700 mb-1">{seller}</p>
+                    {sellerItems.map((item) => (
+                      <div key={item.excipient} className="flex justify-between text-sm text-slate-600 pl-3">
+                        <span>{item.name} × {item.quantity}</span>
+                        <span className="font-medium">{(parseFloat(item.unit_price) * item.quantity).toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t border-slate-200 pt-3 mb-4">
+                <p className="text-sm text-slate-500">Delivering to:</p>
+                <p className="text-sm font-medium text-slate-800">
+                  {addresses.find((a) => a.id === selectedAddressId)?.label || ""}
+                  {" — "}
+                  {[addresses.find((a) => a.id === selectedAddressId)?.street, addresses.find((a) => a.id === selectedAddressId)?.city].filter(Boolean).join(", ")}
+                </p>
+              </div>
+
+              <div className="border-t border-slate-200 pt-3 mb-6">
+                <p className="text-lg font-bold text-right">
+                  Total: <span className="text-accent-700">{total.toFixed(2)}</span>
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowReview(false)}
+                  className="btn-secondary flex-1"
+                >
+                  Go back
+                </button>
+                <button
+                  onClick={handlePlaceOrder}
+                  disabled={loading}
+                  className="btn-primary flex-1 disabled:opacity-50"
+                >
+                  {loading ? "Placing..." : "Confirm order"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

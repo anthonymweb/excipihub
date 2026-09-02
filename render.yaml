@@ -1,0 +1,52 @@
+services:
+  # ---------- Backend API ----------
+  - type: web
+    name: excipihub-api
+    runtime: python
+    plan: free
+    buildCommand: |
+      cd backend
+      pip install -r requirements.txt
+      python manage.py collectstatic --no-input
+      python manage.py migrate
+    startCommand: cd backend && gunicorn excipihub_project.wsgi:application
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_ALLOWED_HOSTS
+        fromService:
+          name: excipihub-api
+          property: host
+      - key: CORS_ALLOWED_ORIGINS
+        fromService:
+          name: excipihub-frontend
+          property: host
+        prefix: "https://"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: excipihub-db
+          property: connectionString
+    healthCheckPath: /admin/
+
+  # ---------- Frontend (Static Site) ----------
+  - type: static
+    name: excipihub-frontend
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: "https://excipihub-api.onrender.com/api"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  - name: excipihub-db
+    plan: free
+    databaseName: excipihub
