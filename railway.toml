@@ -1,0 +1,7 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "cd backend && gunicorn excipihub_project.wsgi:application"
+healthcheckPath = "/admin/"
+healthcheckTimeout = 300
