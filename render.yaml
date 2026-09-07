@@ -18,10 +18,12 @@ services:
       - key: DJANGO_ALLOWED_HOSTS
         fromService:
           name: excipihub-api
+          type: web
           property: host
       - key: CORS_ALLOWED_ORIGINS
         fromService:
           name: excipihub-frontend
+          type: web
           property: host
         prefix: "https://"
       - key: DATABASE_URL
