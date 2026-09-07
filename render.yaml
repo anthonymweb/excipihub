@@ -30,21 +30,19 @@ services:
           property: connectionString
     healthCheckPath: /admin/
 
-  # ---------- Frontend (Static Site) ----------
-  - type: static_site
+  # ---------- Frontend ----------
+  - type: web
     name: excipihub-frontend
+    runtime: node
+    plan: free
     buildCommand: |
       cd frontend
       npm install
       npm run build
-    staticPublishPath: frontend/dist
+    startCommand: cd frontend && npx serve dist -s -l 3000
     envVars:
       - key: VITE_API_URL
         value: "https://excipihub-api.onrender.com/api"
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
 
 databases:
   - name: excipihub-db
