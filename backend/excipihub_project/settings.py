@@ -72,14 +72,13 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20,
 }
 
-# React dev server origin — Vite's default port
+# Allowed CORS origins — localhost for dev, env var for production
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-]
-CORS_ALLOWED_ORIGINS += [
     origin.strip()
-    for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
+    for origin in os.environ.get(
+        'CORS_ALLOWED_ORIGINS',
+        'http://localhost:5173,http://127.0.0.1:5173',
+    ).split(',')
     if origin.strip()
 ]
 
