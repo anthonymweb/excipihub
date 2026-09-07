@@ -31,7 +31,7 @@ services:
     healthCheckPath: /admin/
 
   # ---------- Frontend (Static Site) ----------
-  - type: static
+  - type: static_site
     name: excipihub-frontend
     buildCommand: |
       cd frontend
