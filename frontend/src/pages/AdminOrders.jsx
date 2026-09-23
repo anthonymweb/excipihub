@@ -34,7 +34,7 @@ export default function AdminOrders() {
     { key: "id", label: "Order ID", render: (r) => r.id?.toString().slice(0, 8) },
     { key: "status", label: "Status", render: (r) => <StatusBadge status={r.status} /> },
     { key: "buyer_name", label: "Buyer" },
-    { key: "total", label: "Total" },
+    { key: "total_amount", label: "Total" },
     { key: "created_at", label: "Created" },
   ];
 

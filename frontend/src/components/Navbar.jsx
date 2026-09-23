@@ -5,7 +5,7 @@ import { useCart } from "../context/CartContext.jsx";
 import { api } from "../api/client.js";
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const { items } = useCart();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -17,14 +17,13 @@ export default function Navbar() {
   const isAdmin = user?.is_staff;
 
   useEffect(() => {
-    if (user && !isSeller) {
-      const token = localStorage.getItem("excipihub_token");
+    if (user && !isSeller && token) {
       api.listNotifications(token).then((d) => {
         const list = d.results || d;
         setNotifCount(list.filter((n) => !n.is_read).length);
       }).catch(() => {});
     }
-  }, [user]);
+  }, [user, token]);
 
   function handleLogout() {
     logout();
@@ -32,7 +31,7 @@ export default function Navbar() {
   }
 
   const NavLink = ({ to, children }) => (
-    <Link to={to} className="text-slate-600 hover:text-slate-900" onClick={() => setMobileOpen(false)}>
+    <Link to={to} className="block py-3 px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors" onClick={() => setMobileOpen(false)}>
       {children}
     </Link>
   );
@@ -116,7 +115,7 @@ export default function Navbar() {
           </button>
         </div>
         {mobileOpen && (
-          <div className="md:hidden pb-4 space-y-2">
+          <div className="md:hidden pb-4 space-y-1">
             <NavLink to="/catalog">Catalog</NavLink>
             {isBuyer && <NavLink to="/rfqs">RFQs</NavLink>}
             {isBuyer && <NavLink to="/saved">Saved</NavLink>}
@@ -135,10 +134,10 @@ export default function Navbar() {
             {user && !isSeller && <NavLink to="/cart">Cart</NavLink>}
             {user && !isSeller && <NavLink to="/notifications">Notifications</NavLink>}
             {user && (isBuyer || isSeller) && <NavLink to="/messages">Messages</NavLink>}
-            <hr className="border-slate-200" />
+            <hr className="border-slate-200 my-2" />
             {user ? (
               <>
-                <span className="block py-2 text-sm text-slate-500">{user.username}</span>
+                <span className="block py-3 px-3 text-sm text-slate-500">{user.username}</span>
                 <button onClick={handleLogout} className="btn-secondary text-sm w-full">Logout</button>
               </>
             ) : (

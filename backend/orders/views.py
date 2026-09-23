@@ -62,9 +62,10 @@ class OrderViewSet(viewsets.ModelViewSet):
         order = self.get_object()
         if order.buyer != request.user:
             return Response({"detail": "Not authorized."}, status=403)
-        if order.status != Order.Status.BUYER_CONFIRMED:
-            order.status = Order.Status.BUYER_CONFIRMED
-            order.save(update_fields=["status"])
+        if order.status != Order.Status.DELIVERED:
+            return Response({"detail": "You can only confirm delivery for orders that have been delivered."}, status=400)
+        order.status = Order.Status.BUYER_CONFIRMED
+        order.save(update_fields=["status"])
         return Response(OrderSerializer(order).data)
 
     @action(detail=True, methods=["post"], url_path="pay")
@@ -78,10 +79,6 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Response({"detail": "This order is not awaiting payment."}, status=400)
 
         payment = getattr(order, "payment", None)
-        if payment:
-            payment.status = Payment.Status.PROCESSING
-            payment.save(update_fields=["status"])
-
         if payment:
             payment.status = Payment.Status.PAID
             payment.paid_at = timezone.now()
@@ -186,6 +183,17 @@ class SellerOrderViewSet(viewsets.ReadOnlyModelViewSet):
         valid = [s[0] for s in Order.Status.choices]
         if new_status not in valid:
             return Response({"detail": f"Invalid status. Choose from {valid}"}, status=400)
+
+        allowed_seller_statuses = [
+            Order.Status.CONFIRMED,
+            Order.Status.BATCH_ALLOCATED,
+            Order.Status.QC_RELEASE,
+            Order.Status.PREPARING,
+            Order.Status.PACKED,
+            Order.Status.SHIPPED,
+        ]
+        if new_status not in allowed_seller_statuses:
+            return Response({"detail": "Sellers cannot set this status."}, status=403)
 
         old = order.status
         order.status = new_status

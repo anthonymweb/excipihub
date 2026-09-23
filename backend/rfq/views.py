@@ -58,6 +58,10 @@ class RFQViewSet(viewsets.ModelViewSet):
         rfq = self.get_object()
         if rfq.buyer_id != request.user.id and not request.user.is_staff:
             return Response({"detail": "Not authorized."}, status=403)
+        if rfq.status == RFQ.Status.CLOSED:
+            return Response({"detail": "RFQ is already closed."}, status=400)
+        if rfq.status == RFQ.Status.CANCELLED:
+            return Response({"detail": "Cannot close a cancelled RFQ."}, status=400)
         rfq.status = RFQ.Status.CLOSED
         rfq.save(update_fields=["status"])
         return Response(RFQSerializer(rfq).data)
@@ -97,6 +101,8 @@ class RFQQuoteViewSet(viewsets.ModelViewSet):
         quote = self.get_object()
         if quote.rfq.buyer_id != request.user.id and not request.user.is_staff:
             return Response({"detail": "Only the RFQ owner can accept."}, status=403)
+        if quote.rfq.status not in [RFQ.Status.OPEN, RFQ.Status.QUOTED]:
+            return Response({"detail": "Cannot accept quotes for a closed or cancelled RFQ."}, status=400)
         RFQQuote.objects.filter(rfq=quote.rfq).exclude(id=quote.id).update(status=RFQQuote.Status.REJECTED)
         quote.status = RFQQuote.Status.ACCEPTED
         quote.save(update_fields=["status"])

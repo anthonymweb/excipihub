@@ -21,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
             "verification_status",
             "is_staff",
         ]
-        read_only_fields = ["id", "verification_status", "is_staff"]
+        read_only_fields = ["id", "verification_status", "is_staff", "role", "is_active_seller"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):

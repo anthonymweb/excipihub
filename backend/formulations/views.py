@@ -39,7 +39,7 @@ class FormulationKitViewSet(viewsets.ModelViewSet):
                         {
                             "id": e.id,
                             "name": e.name,
-                            "seller": e.seller_name,
+                            "seller": e.seller.company_name if e.seller else "Unknown",
                             "price": str(e.unit_price),
                             "unit": e.unit,
                             "stock": e.stock_quantity,

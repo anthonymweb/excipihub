@@ -56,8 +56,9 @@ export default function ProductDetail() {
     setSaving(true);
     try {
       await api.toggleSavedProduct(product.id, token);
-      setSaved((prev) => !prev);
-      toast.success(saved ? "Removed from saved" : "Saved to your list");
+      const newSaved = !saved;
+      setSaved(newSaved);
+      toast.success(newSaved ? "Saved to your list" : "Removed from saved");
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -126,7 +127,7 @@ export default function ProductDetail() {
       <Link to="/catalog" className="text-accent-600 hover:text-accent-700 text-sm mb-4 inline-block">
         &larr; Back to catalog
       </Link>
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="card">
           <div className="flex items-start justify-between mb-4">
             <h1 className="text-2xl font-bold">{product.name}</h1>
@@ -175,7 +176,7 @@ export default function ProductDetail() {
                 min="1"
                 max={product.stock_quantity}
                 value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
+                onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
                 className="input mb-4"
               />
               <button
@@ -192,7 +193,7 @@ export default function ProductDetail() {
 
       <div className="card mt-8">
         <h2 className="text-lg font-semibold mb-4">Pharmaceutical Details</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex justify-between border-b border-slate-100 py-2">
             <span className="text-slate-500">CAS Number</span>
             <span className="font-medium">{product.cas_number || "—"}</span>

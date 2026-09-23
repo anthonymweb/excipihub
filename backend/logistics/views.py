@@ -14,4 +14,11 @@ class AddressViewSet(viewsets.ModelViewSet):
         return Address.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        instance = serializer.save(user=self.request.user)
+        if instance.is_default:
+            Address.objects.filter(user=self.request.user, is_default=True).exclude(pk=instance.pk).update(is_default=False)
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        if instance.is_default:
+            Address.objects.filter(user=self.request.user, is_default=True).exclude(pk=instance.pk).update(is_default=False)

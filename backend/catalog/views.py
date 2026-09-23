@@ -104,4 +104,8 @@ class BatchViewSet(viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
+        excipient = serializer.validated_data.get("excipient")
+        if excipient and excipient.seller_id != self.request.user.id:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You can only create batches for your own excipients.")
         serializer.save()

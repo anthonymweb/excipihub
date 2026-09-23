@@ -17,7 +17,7 @@ const SORT_OPTIONS = [
 const ITEMS_PER_PAGE = 20;
 
 export default function Catalog() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { addItem } = useCart();
   const [excipients, setExcipients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -60,7 +60,6 @@ export default function Catalog() {
     e.preventDefault();
     setError("");
     try {
-      const token = user?.token || localStorage.getItem("excipihub_token");
       await api.createExcipient(form, token);
       setShowForm(false);
       setForm({ name: "", category: "", grade: "", unit: "", unit_price: "", stock_quantity: "", description: "" });

@@ -86,8 +86,8 @@ export default function SupplierOrders() {
                 </span>
               </div>
 
-              <div className="overflow-x-auto mb-4">
-                <table className="w-full text-sm">
+              <div className="overflow-x-auto mb-4 -mx-6 px-6">
+                <table className="w-full text-sm min-w-[500px]">
                   <thead>
                     <tr className="text-left text-slate-500 border-b border-slate-200">
                       <th className="py-2 px-3 font-medium">Item</th>

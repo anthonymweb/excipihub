@@ -186,6 +186,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         items_data = validated_data.pop("items")
+        payment_method = validated_data.pop("payment_method", "card")
         buyer = self.context["request"].user
 
         total = 0
@@ -207,7 +208,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         order.total_amount = total
         order.save(update_fields=["total_amount"])
 
-        payment_method = validated_data.pop("payment_method", "card")
         Payment.objects.create(
             order=order,
             amount=total,

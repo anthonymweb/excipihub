@@ -272,15 +272,15 @@ export default function Cart() {
               <form onSubmit={handleUpdateAddress} className="space-y-3 mt-4 border-t border-slate-200 pt-4">
                 <p className="text-sm font-medium text-slate-600">Editing address</p>
                 <input className="input" placeholder="Label (e.g. Lab, Office)" value={editingAddress.label || ""} onChange={(e) => setEditingAddress({ ...editingAddress, label: e.target.value })} />
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input className="input" placeholder="Street" value={editingAddress.street || ""} onChange={(e) => setEditingAddress({ ...editingAddress, street: e.target.value })} required />
                   <input className="input" placeholder="District" value={editingAddress.district || ""} onChange={(e) => setEditingAddress({ ...editingAddress, district: e.target.value })} required />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input className="input" placeholder="City" value={editingAddress.city || ""} onChange={(e) => setEditingAddress({ ...editingAddress, city: e.target.value })} />
                   <input className="input" placeholder="State" value={editingAddress.state || ""} onChange={(e) => setEditingAddress({ ...editingAddress, state: e.target.value })} />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input className="input" placeholder="Postal code" value={editingAddress.postal_code || ""} onChange={(e) => setEditingAddress({ ...editingAddress, postal_code: e.target.value })} />
                   <input className="input" placeholder="Country" value={editingAddress.country || ""} onChange={(e) => setEditingAddress({ ...editingAddress, country: e.target.value })} />
                 </div>
@@ -298,15 +298,15 @@ export default function Cart() {
                 </summary>
                 <form onSubmit={handleAddAddress} className="space-y-3 mt-3">
                   <input className="input" placeholder="Label (e.g. Lab, Office)" value={newAddress.label} onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })} />
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input className="input" placeholder="Street" value={newAddress.street} onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })} required />
                     <input className="input" placeholder="District" value={newAddress.district} onChange={(e) => setNewAddress({ ...newAddress, district: e.target.value })} required />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input className="input" placeholder="City" value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} />
                     <input className="input" placeholder="State" value={newAddress.state} onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input className="input" placeholder="Postal code" value={newAddress.postal_code} onChange={(e) => setNewAddress({ ...newAddress, postal_code: e.target.value })} />
                     <input className="input" placeholder="Country" value={newAddress.country} onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })} />
                   </div>

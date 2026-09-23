@@ -27,13 +27,10 @@ export default function OrderDetail() {
 
   useEffect(() => {
     if (!token) return;
+    setLoading(true);
     api
-      .listOrders(token)
-      .then((data) => {
-        const orders = data.results || data;
-        const found = orders.find((o) => o.id === id);
-        setOrder(found || null);
-      })
+      .getOrder(id, token)
+      .then(setOrder)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [id, token]);

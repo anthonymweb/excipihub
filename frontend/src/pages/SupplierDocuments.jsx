@@ -32,7 +32,7 @@ export default function SupplierDocuments() {
   const [uploading, setUploading] = useState(false);
 
   function load() {
-    if (!token) return;
+    if (!token || !user?.id) return;
     api
       .listDocuments({ supplier: user.id })
       .then((data) => setDocs(data.results || data || []))

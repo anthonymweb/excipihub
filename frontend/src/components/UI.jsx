@@ -51,12 +51,12 @@ export function Table({ columns, data, empty }) {
     return <p className="text-center text-slate-400 py-8">{empty || "No records found."}</p>;
   }
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto -mx-6 px-6">
+      <table className="w-full text-sm min-w-[600px]">
         <thead>
           <tr className="text-left text-slate-500 border-b border-slate-200">
             {columns.map((c) => (
-              <th key={c.key} className="py-3 px-3 font-medium">{c.label}</th>
+              <th key={c.key} className="py-3 px-3 font-medium whitespace-nowrap">{c.label}</th>
             ))}
           </tr>
         </thead>

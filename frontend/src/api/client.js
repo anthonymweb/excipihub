@@ -120,6 +120,7 @@ export const api = {
 
   // Orders (buyer + seller)
   listOrders: (token) => request("/orders/", { token }),
+  getOrder: (id, token) => request(`/orders/${id}/`, { token }),
   createOrder: (payload, token) =>
     request("/orders/", { method: "POST", body: payload, token }),
   raiseOrderDispute: (orderId, payload, token) =>
