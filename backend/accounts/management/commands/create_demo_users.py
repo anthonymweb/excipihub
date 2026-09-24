@@ -69,9 +69,15 @@ class Command(BaseCommand):
 
         excipients = []
         for data in excipient_data:
-            exc = Excipient.objects.create(**data, is_active=True)
+            exc, created = Excipient.objects.get_or_create(
+                cas_number=data["cas_number"], seller=data["seller"],
+                defaults={**data, "is_active": True},
+            )
             excipients.append(exc)
-            self.stdout.write(f"  + Excipient: {exc.name}")
+            if created:
+                self.stdout.write(f"  + Excipient: {exc.name}")
+            else:
+                self.stdout.write(f"  ~ Excipient: {exc.name} (exists)")
 
         # ── Batches ──────────────────────────────────────────────
         statuses = ["available", "available", "available", "qc_hold", "released"]
