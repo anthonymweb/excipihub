@@ -21,6 +21,9 @@ class Command(BaseCommand):
     help = "Seed the database with realistic demo data for the pharmaceutical excipient marketplace"
 
     def handle(self, *args, **options):
+        if Excipient.objects.exists():
+            self.stdout.write(self.style.WARNING("Demo data already exists, skipping."))
+            return
         self.stdout.write("Seeding demo data...\n")
 
         # ── Users ────────────────────────────────────────────────
@@ -46,10 +49,10 @@ class Command(BaseCommand):
         sellers = [manufacturer, distributor]
 
         # ── Addresses ────────────────────────────────────────────
-        addr1 = Address.objects.create(user=buyers[1], label="Lab", district="Kampala", street="Plot 45, Makerere Hill Road", latitude=0.3319, longitude=32.5700, is_default=True)
-        addr2 = Address.objects.create(user=buyers[2], label="Office", district="Kampala", street="University Road, Makerere", latitude=0.3330, longitude=32.5680, is_default=True)
-        addr3 = Address.objects.create(user=buyers[3], label="Warehouse", district="Industrial Area", street="3rd Street, Industrial Area", latitude=0.3030, longitude=32.5880, is_default=True)
-        addr4 = Address.objects.create(user=buyers[0], label="Admin Office", district="Nakawa", street="Plot 12, Port Bell Road", latitude=0.3130, longitude=32.5900, is_default=True)
+        addr1, _ = Address.objects.get_or_create(user=buyers[1], label="Lab", defaults={"district": "Kampala", "street": "Plot 45, Makerere Hill Road", "latitude": 0.3319, "longitude": 32.5700, "is_default": True})
+        addr2, _ = Address.objects.get_or_create(user=buyers[2], label="Office", defaults={"district": "Kampala", "street": "University Road, Makerere", "latitude": 0.3330, "longitude": 32.5680, "is_default": True})
+        addr3, _ = Address.objects.get_or_create(user=buyers[3], label="Warehouse", defaults={"district": "Industrial Area", "street": "3rd Street, Industrial Area", "latitude": 0.3030, "longitude": 32.5880, "is_default": True})
+        addr4, _ = Address.objects.get_or_create(user=buyers[0], label="Admin Office", defaults={"district": "Nakawa", "street": "Plot 12, Port Bell Road", "latitude": 0.3130, "longitude": 32.5900, "is_default": True})
 
         # ── Excipients ───────────────────────────────────────────
         excipient_data = [
